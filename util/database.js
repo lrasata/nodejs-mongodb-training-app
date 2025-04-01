@@ -1,17 +1,41 @@
-const mongodb = require('mongodb');
-const MongoClient = mongodb.MongoClient;
+const { MongoClient, ServerApiVersion } = require('mongodb');
+const uri = "mongodb+srv://rmliantsoa:png92H71hTPcGXYY@cluster0.pbpiaac.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+
+let _db;
+
+// Create a MongoClient with a MongoClientOptions object to set the Stable API version
+const client = new MongoClient(uri, {
+    serverApi: {
+        version: ServerApiVersion.v1,
+        strict: true,
+        deprecationErrors: true,
+    },
+    useUnifiedTopology: true
+});
 
 const mongoConnect = callback => {
-  MongoClient.connect(
-    'mongodb+srv://maximilian:9u4biljMQc4jjqbe@cluster0-ntrwp.mongodb.net/test?retryWrites=true'
-  )
+    client.connect()
     .then(client => {
-      console.log('Connected!');
-      callback(client);
+        console.log('Connected!');
+        _db = client.db();
+        callback();
     })
     .catch(err => {
-      console.log(err);
+        console.log(err);
+        throw err;
     });
 };
 
-module.exports = mongoConnect;
+const getDb = () => {
+    if (_db) {
+        return _db;
+    }
+    throw 'No database found!';
+};
+
+exports.mongoConnect = mongoConnect;
+exports.getDb = getDb;
+
+
+
+
